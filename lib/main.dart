@@ -1,29 +1,31 @@
-// Flutter Riverpod
+// Flutter Riverpod 3 — 计数器
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() => runApp(ProviderScope(child: MyApp()));
+final counterProvider = NotifierProvider<CounterNotifier, int>(CounterNotifier.new);
 
-final counterProvider = StateNotifierProvider<Counter, int>((ref) => Counter());
+class CounterNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
 
-class Counter extends StateNotifier<int> {
-  Counter() : super(0);
   void increment() => state++;
 }
 
-class MyApp extends StatelessWidget {
+void main() => runApp(const ProviderScope(child: MyApp()));
+
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(counterProvider);
     return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: Consumer((context, ref) {
-            return Text('Count: ${ref.watch(counterProvider)}');
-          }),
-        ),
+        appBar: AppBar(title: const Text('Riverpod')),
+        body: Center(child: Text('Count: $count')),
         floatingActionButton: FloatingActionButton(
           onPressed: () => ref.read(counterProvider.notifier).increment(),
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
         ),
       ),
     );
